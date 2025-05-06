@@ -1,0 +1,32 @@
+name: Dispatch Workflow
+
+on:
+  repository_dispatch:
+    types:
+      - load-test-trigger
+
+jobs:
+  handle-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Perform operation
+        run: echo "Triggered by load-test-trigger event"
+
+      - name: Install k6
+        run: |
+          if ! command -v k6 &> /dev/null; then
+            curl -sL -o k6.deb https://dl.k6.io/deb/dists/stable/main/binary-amd64/k6-v0.44.1-amd64.deb
+            sudo dpkg -i k6.deb
+          fi
+
+      - name: Run k6 load test
+        run: k6 run main.js
+      
+      - name: Upload summary.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-summary
+          path: ../../summary.json
