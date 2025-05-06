@@ -1,0 +1,19 @@
+name: Dispatch Workflow
+
+on:
+  repository_dispatch:
+    types:
+      - load-test-trigger
+
+jobs:
+  handle-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Perform operation
+        run: echo "Triggered by load-test-trigger event"
+
+      - name: Run k6 load test
+        run: ./k6.exe run main.js
